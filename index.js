@@ -9,15 +9,18 @@ const PART_LEFT_WRIST = "leftWrist";
 const PART_RIGHT_EAR = "rightEar";
 const PART_LEFT_EAR = "leftEar";
 
-const DRAWING_KEYPOINT_IDENTIFIER = PART_RIGHT_WRIST;
-const NON_DRAWING_KEYPOINT = PART_LEFT_WRIST;
-
 let isDrawing = false;
 let timeDrawingToggleChanged;
 let lineColor = "#FE6B31";
 
-const stringNotDrawing = "[Not drawing]<br/>- Put your right hand at the starting position<br/>- Touch your face with your left hand to start drawing";
-const stringDrawing = "[Drawing]<br/>- Use your right hand to draw<br/>- Touch your face with your left hand to stop drawing";
+
+const stringNotDrawingRightHanded = "[Not drawing]<br/>- Put your right hand at the starting position<br/>- Touch your face with your left hand to start drawing";
+const stringDrawingRightHanded = "[Drawing]<br/>- Use your right hand to draw<br/>- Touch your face with your left hand to stop drawing";
+
+const stringNotDrawingLeftHanded = "[Not drawing]<br/>- Put your left hand at the starting position<br/>- Touch your face with your right hand to start drawing";
+const stringDrawingLeftHanded = "[Drawing]<br/>- Use your left hand to draw<br/>- Touch your face with your right hand to stop drawing";
+
+let isRightHanded = true;
 
 function setup() {
   const canvas = createCanvas(800, 600);
@@ -52,7 +55,7 @@ function setup() {
   video.hide();
 
   isDrawing = false;
-  select("#drawing-state").html(stringNotDrawing);
+  select("#drawing-state").html(isRightHanded ? stringNotDrawingRightHanded:  stringNotDrawingLeftHanded);
   timeDrawingToggleChanged = millis();
 
   select("#erase").mouseClicked(() => {
@@ -65,6 +68,22 @@ function setup() {
   const colorPicker = select("#color-picker");
   colorPicker.changed(() => {
     lineColor = colorPicker.value()
+  });
+
+  const radioRightHanded = select("#radio-right-handed");
+  const radioLeftHanded = select("#radio-left-handed");
+
+  radioRightHanded.changed(() => {
+    console.log(radioRightHanded.value());
+    isRightHanded = true;
+    updateDrawingInstructions();
+
+  });
+  radioLeftHanded.changed(() => {
+    console.log(radioLeftHanded.value());
+    isRightHanded = false;
+    updateDrawingInstructions();
+
   });
 }
 
@@ -133,7 +152,7 @@ function drawSkeleton() {
 function drawLineFromDrawingKeypoint() {
   for (let i = 0; i < poses.length; i += 1) {
     const pose = poses[i].pose;
-    const drawingKeypoint = pose[DRAWING_KEYPOINT_IDENTIFIER];
+    const drawingKeypoint = pose[isRightHanded ? PART_RIGHT_WRIST : PART_LEFT_WRIST];
 
     if (drawingKeypoint && drawingKeypoint.confidence > 0.55) {
       if (previousDrawingKeypoint) {
@@ -159,7 +178,7 @@ function detectDrawingToggle() {
     }
     for (let i = 0; i < poses.length; i += 1) {
         const pose = poses[i].pose;
-        const nonDrawingKeypoint = pose[NON_DRAWING_KEYPOINT];
+        const nonDrawingKeypoint = pose[isRightHanded ? PART_LEFT_WRIST : PART_RIGHT_WRIST];
         const leftEar = pose[PART_LEFT_EAR];
         const rightEar = pose[PART_RIGHT_EAR];
 
@@ -189,11 +208,16 @@ function detectDrawingToggle() {
             timeDrawingToggleChanged = millis();
             isDrawing = !isDrawing;
 
-            const drawingState = select("#drawing-state");
-            drawingState.html(isDrawing ? stringDrawing : stringNotDrawing);
-            drawingState.removeClass(isDrawing ? "red-text" : "green-text");
-            drawingState.addClass(isDrawing ? "green-text" :"red-text");
+            updateDrawingInstructions();
         }
         
       }
+}
+
+
+function updateDrawingInstructions() {
+  const drawingState = select("#drawing-state");
+  drawingState.html(isDrawing ? (isRightHanded ? stringDrawingRightHanded :  stringDrawingLeftHanded) : (isRightHanded ? stringNotDrawingRightHanded :  stringNotDrawingLeftHanded));
+  drawingState.removeClass(isDrawing ? "red-text" : "green-text");
+  drawingState.addClass(isDrawing ? "green-text" :"red-text");
 }
