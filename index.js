@@ -154,7 +154,6 @@ function drawLineFromDrawingKeypoint() {
 
 function detectDrawingToggle() {
     const timeSinceDrawingToggleChanged = millis() - timeDrawingToggleChanged;
-    console.log(timeSinceDrawingToggleChanged);
     if(timeSinceDrawingToggleChanged < 2 * 1000) {
         return;
     }
@@ -190,8 +189,10 @@ function detectDrawingToggle() {
             timeDrawingToggleChanged = millis();
             isDrawing = !isDrawing;
 
-            select("#drawing-state").html(isDrawing ? stringDrawing : stringNotDrawing);
-
+            const drawingState = select("#drawing-state");
+            drawingState.html(isDrawing ? stringDrawing : stringNotDrawing);
+            drawingState.removeClass(isDrawing ? "red-text" : "green-text");
+            drawingState.addClass(isDrawing ? "green-text" :"red-text");
         }
         
       }
