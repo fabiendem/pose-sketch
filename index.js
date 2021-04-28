@@ -99,7 +99,7 @@ function draw() {
   pop();
 
   // We can call both functions to draw all keypoints and the skeletons
-  drawKeypoints();
+  // drawKeypoints();
   //   drawSkeleton();
   if (isDrawing) {
     drawLineFromDrawingKeypoint();
@@ -207,6 +207,7 @@ function detectDrawingToggle() {
             console.log("Touching face");
             timeDrawingToggleChanged = millis();
             isDrawing = !isDrawing;
+            previousDrawingKeypoint = undefined;
 
             updateDrawingInstructions();
         }
