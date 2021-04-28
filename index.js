@@ -157,7 +157,7 @@ function drawLineFromDrawingKeypoint() {
     if (drawingKeypoint && drawingKeypoint.confidence > 0.55) {
       if (previousDrawingKeypoint) {
         drawingCanvas.stroke(lineColor);
-        drawingCanvas.strokeWeight(10);
+        drawingCanvas.strokeWeight(20);
         drawingCanvas.line(
           previousDrawingKeypoint.x,
           previousDrawingKeypoint.y,
